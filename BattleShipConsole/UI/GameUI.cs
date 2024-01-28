@@ -8,15 +8,7 @@ public class GameUI
 {
     public static void PrintBoard(IBoard board)
     {
-        Console.WriteLine($"\n\t\t\t-- {board.GetType().Name} --");
-
-        // Print column numbers
-        for (int i = 1; i <= board.Columns; i++)
-        {
-            Console.Write($"{i,6} ");
-        }
-        Console.WriteLine();
-
+        Console.WriteLine($"\n\t\t\t-- {board.GetType().Name} --\n");
         // Print rows
         for (int i = 0; i < board.Rows; i++)
         {
@@ -30,6 +22,12 @@ public class GameUI
             }
             Console.WriteLine();
         }
+        // Print column numbers
+        for (int i = 1; i <= board.Columns; i++)
+        {
+            Console.Write($"{i,6} ");
+        }
+        Console.WriteLine();
     }
 
     private static void PrintCellState(CellState state)
@@ -72,6 +70,7 @@ public class GameUI
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         int count = 1;
 
+        System.Console.WriteLine();
         foreach (var shipType in gameController.PlayersUnmanagedShips[player])
         {
             int size = shipType switch
@@ -88,6 +87,7 @@ public class GameUI
             Console.WriteLine($"[{count}] {shipType} ");
             count++;
         }
+        System.Console.WriteLine();
     }
 
     public static void AddPlayerInput(GameController gameController)
@@ -306,7 +306,7 @@ public class GameUI
         if (coordinates.Length >= 2)
         {
             string[] values = coordinates[1].Split(',');
-            if (values.Length == 2 && int.TryParse(values[0], out x) && int.TryParse(values[1], out y))
+            if (values.Length == 2 && int.TryParse(values[0], out y) && int.TryParse(values[1], out x))
             {
                 return true;
             }
@@ -320,7 +320,7 @@ public class GameUI
 
         string[] coordinates = input.Split(',');
 
-        if (coordinates.Length == 2 && int.TryParse(coordinates[0], out x) && int.TryParse(coordinates[1], out y))
+        if (coordinates.Length == 2 && int.TryParse(coordinates[0], out y) && int.TryParse(coordinates[1], out x))
         {
             return true;
         }

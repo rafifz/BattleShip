@@ -217,8 +217,8 @@ namespace BattleShip.Controller
         private bool TryPlaceShip(MainBoard mainBoard, Ship ship, int startX, int startY, int offsetX, int offsetY, int length)
         {
             if ( //ensure that does not go outside the bounds of the mainBoard.
-                startX + offsetX * length > mainBoard.Columns + 1 ||
-                startY + offsetY * length > mainBoard.Rows + 1
+                startX + (offsetX * length - 1) > mainBoard.Columns ||
+                startY + (offsetY * length - 1) > mainBoard.Rows
             )
             {
                 return false;

@@ -228,9 +228,9 @@ public class GameController
             int x = startX + i * offsetX;
             int y = startY + i * offsetY;
 
-            IPosition shipPosition = mainBoard.BoardPositions.FirstOrDefault(p => p.X == x && p.Y == y)!;
+            IPosition shipPosition = GetPositionInBoard(mainBoard, new Position(x, y));
             if (shipPosition == null || shipPosition.State != CellState.Empty) // return  false if the cell state is not empty
-            {
+            {   
                 return false;
             }
 
@@ -248,12 +248,9 @@ public class GameController
     /// <returns>True if the attack was successful, false otherwise.</returns>
     public bool PerformAttack(IPosition position)
     {
-        IPosition ownPositionInBattleBoard = PlayerBattleBoard[CurrentPlayer!].BoardPositions.FirstOrDefault(p => p.X == position.X && p.Y == position.Y)!;
-        IPosition ownPositionInMainBoard = PlayerMainBoard[CurrentPlayer!].BoardPositions.FirstOrDefault(p => p.X == position.X && p.Y == position.Y)!;
-        IPosition enemyPositionInBattleBoard = PlayerBattleBoard[Opponent].BoardPositions.FirstOrDefault(p => p.X == position.X && p.Y == position.Y)!;
-        IPosition enemyPositionInMainBoard = PlayerMainBoard[Opponent].BoardPositions.FirstOrDefault(p => p.X == position.X && p.Y == position.Y)!;
+        var ownPositionInBattleBoard = GetPositionInBoard(PlayerBattleBoard[CurrentPlayer!], position);
+        var enemyPositionInMainBoard = GetPositionInBoard(PlayerMainBoard[Opponent!], position);
 
-        var enemyOwnedShip = PlayerMainBoard[Opponent].OwnedShips;
         if (position != null && enemyPositionInMainBoard.State == CellState.Empty) //attack miss
         {
             ownPositionInBattleBoard.State = CellState.Miss;
@@ -262,11 +259,15 @@ public class GameController
         {
             ownPositionInBattleBoard.State = CellState.Hit;
             enemyPositionInMainBoard.State = CellState.Sink;
-
             DecreaseShipsLife(PlayerMainBoard[Opponent].OwnedShips, position);
             return true;
         }
-        return true;
+
+        return false;
+    }
+    private IPosition GetPositionInBoard(IBoard board, IPosition position)
+    {
+        return board.BoardPositions.FirstOrDefault(p => p.X == position.X && p.Y == position.Y)!;
     }
 
     /// <summary>
@@ -276,18 +277,17 @@ public class GameController
     /// <param name="position">The position of the ship to decrease the life of.</param>
     private void DecreaseShipsLife(List<Ship> ownedShips, IPosition position)
     {
-        var affectedShip = ownedShips.FirstOrDefault(ship =>
-            ship.ShipPositions.Any(pos => pos.X == position.X && pos.Y == position.Y)
-        );
-
-        if (affectedShip != null)
+        foreach (var ship in ownedShips)
         {
-            affectedShip.LifePoint--; // Decrement LifePoint of the ship
-
-            if (affectedShip.LifePoint == 0) // If LifePoint becomes 0, the ship is destroyed
+            if (ship.ShipPositions.Any(pos => pos.X == position.X && pos.Y == position.Y))
             {
-                affectedShip.IsDestroyed = true;
-                CheckWinCondition();
+                ship.LifePoint--; // Decrement LifePoint of the ship
+                if (ship.LifePoint == 0) // If LifePoint becomes 0, the ship is destroyed
+                {
+                    ship.IsDestroyed = true;
+                    CheckWinCondition();
+                }
+                break; // Exit the loop after finding the affected ship
             }
         }
     }

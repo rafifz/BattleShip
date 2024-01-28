@@ -136,9 +136,9 @@ public class GameUI
         }
         else if (userInput == "2")
         {
-            // Ship ship = new (new Position(1,1), ShipType.Destroyer, ShipOrientation.Horizontal);
-            // gameController.TrySetShip(gameController.PlayerMainBoard[player], ship);
-            gameController.SetRandomShip(gameController.PlayerMainBoard[player]);
+            Ship ship = new (new Position(1,1), ShipType.Destroyer, ShipOrientation.Horizontal);
+            gameController.TrySetShip(gameController.PlayerMainBoard[player], ship);
+            //gameController.SetRandomShip(gameController.PlayerMainBoard[player]);
             Console.WriteLine("Ship successfully set randomly");
             Thread.Sleep(500);
             Console.Clear();
@@ -244,7 +244,7 @@ public class GameUI
 
             if (gameController.Status == GameStatus.GameEnd)
             {
-                Console.WriteLine($"All {gameController.Opponent} ship's have been destroyed");
+                Console.WriteLine($"All {gameController.Opponent.Name} ship's have been destroyed");
                 Thread.Sleep(2000);
             }
             else if (attackPosition != null && attackPosition.State == CellState.Hit)

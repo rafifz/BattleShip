@@ -12,6 +12,7 @@ public class GameUI
         // Print rows
         for (int i = 0; i < board.Rows; i++)
         {
+            //print Rows number
             Console.Write($"{i + 1,2} ");
 
             // Print columns

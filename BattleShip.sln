@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleShipLibrary", "Battle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleShipConsole", "BattleShipConsole\BattleShipConsole.csproj", "{882E6AFC-DDB7-44BA-921F-B3BE4D877C26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleShip.Test", "BattleShip.Test\BattleShip.Test.csproj", "{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,5 +58,17 @@ Global
 		{882E6AFC-DDB7-44BA-921F-B3BE4D877C26}.Release|x64.Build.0 = Release|Any CPU
 		{882E6AFC-DDB7-44BA-921F-B3BE4D877C26}.Release|x86.ActiveCfg = Release|Any CPU
 		{882E6AFC-DDB7-44BA-921F-B3BE4D877C26}.Release|x86.Build.0 = Release|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Debug|x64.Build.0 = Debug|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Release|x64.ActiveCfg = Release|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Release|x64.Build.0 = Release|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE28D0E3-6346-4D6A-B7FD-93B3C869CABA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

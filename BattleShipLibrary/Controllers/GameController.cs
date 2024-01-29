@@ -1,6 +1,7 @@
 using BattleShip.Enums;
 using BattleShip.Interfaces;
 using BattleShip.Models;
+using Microsoft.Extensions.Logging;
 
 namespace BattleShip.Controller;
 /// <summary>
@@ -21,7 +22,7 @@ public class GameController
     /// <summary>
     /// Gets the list of players.
     /// </summary>
-    public List<IPlayer> Players { get; private set; }
+    public List<IPlayer> Players { get; set; }
 
     /// <summary>
     /// Gets the main board for each player.
@@ -53,15 +54,19 @@ public class GameController
     /// </summary>
     public IPlayer Opponent => Players[NextPlayerIndex];
 
+    private ILogger<GameController>? _log;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="GameController"/> class.
     /// </summary>
-    public GameController()
+    public GameController(ILogger<GameController>? log = null)
     {
         Players = new List<IPlayer>();
         PlayerMainBoard = new Dictionary<IPlayer, MainBoard>();
         PlayerBattleBoard = new Dictionary<IPlayer, BattleBoard>();
         PlayersUnmanagedShips = new Dictionary<IPlayer, List<ShipType>>();
+        _log = log;
+        _log?.LogInformation("GameController initialized");
     }
 
     /// <summary>

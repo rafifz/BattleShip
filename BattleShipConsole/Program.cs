@@ -1,28 +1,40 @@
 ﻿using BattleShip.Controller;
 using BattleShip.Enums;
 using BattleShip.UI;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 internal class Program {
     private static void Main(string[] args) {
-        GameController gameController = new();
+
+        //manual creation w/o dependency injection
+        var loggerFactory = LoggerFactory.Create(b =>
+                    {
+                        b.ClearProviders();
+                        b.SetMinimumLevel(LogLevel.Information);
+                        b.AddNLog("nlog.config");
+                    });
+        ILogger<GameController> logger = loggerFactory.CreateLogger<GameController>();
+
+        GameController game = new GameController(logger); 
 
         while (true)
         {
-            if (gameController.Status == GameStatus.NotReady)
+            if (game.Status == GameStatus.NotReady)
             {
-                Menus.StartMenu(gameController);
+                Menus.StartMenu(game);
             }
-            else if (gameController.Status == GameStatus.InitializeGame)
+            else if (game.Status == GameStatus.InitializeGame)
             {
-                Menus.InitializeGameMenu(gameController);
+                Menus.InitializeGameMenu(game);
             }
-            else if (gameController.Status == GameStatus.InProgress)
+            else if (game.Status == GameStatus.InProgress)
             {
-                Menus.GamePlayMenu(gameController);
+                Menus.GamePlayMenu(game);
             }
-            else if (gameController.Status == GameStatus.GameEnd)
+            else if (game.Status == GameStatus.GameEnd)
             {
-                Menus.ExitMenu(gameController);
+                Menus.ExitMenu(game);
             }
         }
     }

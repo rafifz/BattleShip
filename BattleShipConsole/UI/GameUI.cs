@@ -2,29 +2,34 @@ using BattleShip.Controller;
 using BattleShip.Enums;
 using BattleShip.Interfaces;
 using BattleShip.Models;
+using Microsoft.Extensions.Logging;
 
 namespace BattleShip.UI;
 public class GameUI
 {
+    private static ILogger<GameUI>? _log;
+    public GameUI(ILogger<GameUI>? log = null)
+    {
+        _log = log;
+    }
     public static void PrintBoard(IBoard board)
     {
         Console.WriteLine($"\n\t\t\t-- {board.GetType().Name} --\n");
-        // Print rows
-        for (int i = 0; i < board.Rows; i++)
+        for (int i = 0; i < board.Columns; i++)
         {
-            //print Rows number
-            Console.Write($"{i + 1,2} ");
+            // Print Columns number in descending order
+            Console.Write($"{board.Columns - i,2} ");
 
-            // Print columns
-            for (int j = 0; j < board.Columns; j++)
+            // Print Rows
+            for (int j = 0; j < board.Rows; j++)
             {
-                IPosition currentPos = board.BoardPositions[i * board.Columns + j];
+                IPosition currentPos = board.BoardPositions[i * board.Rows + j];
                 PrintCellState(currentPos.State);
             }
             Console.WriteLine();
         }
-        // Print column numbers
-        for (int i = 1; i <= board.Columns; i++)
+        // Print Rows numbers
+        for (int i = 1; i <= board.Rows; i++)
         {
             Console.Write($"{i,6} ");
         }
@@ -113,9 +118,10 @@ public class GameUI
     public static bool AddPlayer(IPlayer player, GameController gameController)
     {
         gameController.Players.Add(player);
-        gameController.PlayerMainBoard.Add(player, new MainBoard(8, 8));
-        gameController.PlayerBattleBoard.Add(player, new BattleBoard(8, 8));
+        gameController.PlayerMainBoard.Add(player, new MainBoard(6, 6));
+        gameController.PlayerBattleBoard.Add(player, new BattleBoard(6, 6));
         gameController.PlayersUnmanagedShips[player] = Enum.GetValues(typeof(ShipType)).Cast<ShipType>().ToList();
+        _log?.LogInformation("Player {PlayerName} is successfully added to the game",player.Name);
         return true;
     }
     public static void ShipConfigurationInput(GameController gameController, IPlayer player)
@@ -137,9 +143,9 @@ public class GameUI
         }
         else if (userInput == "2")
         {
-            Ship ship = new (new Position(1,1), ShipType.Destroyer, ShipOrientation.Horizontal);
-            gameController.TrySetShip(gameController.PlayerMainBoard[player], ship);
-            //gameController.SetRandomShip(gameController.PlayerMainBoard[player]);
+            // Ship ship = new (new Position(1,1), ShipType.Destroyer, ShipOrientation.Horizontal);
+            // gameController.TrySetShip(gameController.PlayerMainBoard[player], ship);
+            gameController.SetRandomShip(gameController.PlayerMainBoard[player]);
             Console.WriteLine("Ship successfully set randomly");
             Thread.Sleep(500);
             Console.Clear();

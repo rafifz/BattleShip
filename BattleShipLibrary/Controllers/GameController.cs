@@ -66,7 +66,7 @@ public class GameController
         PlayerBattleBoard = new Dictionary<IPlayer, BattleBoard>();
         PlayersUnmanagedShips = new Dictionary<IPlayer, List<ShipType>>();
         _log = log;
-        _log?.LogInformation("GameController initialized");
+        _log?.LogInformation("GameController initialized successfully.");
     }
 
     /// <summary>
@@ -79,10 +79,12 @@ public class GameController
         if (Players.Contains(player))
         {
             CurrentPlayer = player;
-            return true; // Successfully set the current player
+            _log?.LogInformation("Current player set to {PlayerName} successfully.", player.Name);
+            return true;
         }
 
-        return false; // Player not found in the list
+        _log?.LogWarning("Failed to set current player. Player {PlayerName} not found in the list.", player.Name);
+        return false;
     }
 
     /// <summary>
@@ -91,6 +93,7 @@ public class GameController
     /// <param name="newStatus">The game status to set.</param>
     public void SetGameStatus(GameStatus newStatus)
     {
+        _log?.LogInformation("Game status set to: {newStatus}", newStatus);
         Status = newStatus;
     }
 
@@ -100,6 +103,7 @@ public class GameController
     /// <returns>The updated game status.</returns>
     public GameStatus UpdateGameStatus()
     {
+        GameStatus oldStatus = Status;
         switch (Status)
         {
             case GameStatus.NotReady:
@@ -117,11 +121,12 @@ public class GameController
             default:
                 throw new InvalidOperationException("Invalid game status value.");
         }
+        _log?.LogInformation("Game status updated from {oldStatus} to {newStatus}", oldStatus, Status);
         return Status;
     }
 
     /// <summary>
-    /// Advances to the next turn.
+    /// Add the turn count. and change current player to next player
     /// </summary>
     public void NextTurn()
     {
@@ -132,15 +137,19 @@ public class GameController
     /// <summary>
     /// Checks if the win condition has been met.
     /// </summary>
-    /// <returns>True if all the opponent ownedship IsDestroyed, false otherwise.</returns>
+    /// <returns>True if all the opponent owned ships are destroyed, false otherwise.</returns>
     private bool CheckWinCondition()
     {
+        _log?.LogInformation("Checking win condition. is {Opponent} ships are all has been destroyed",Opponent);
+
         if (PlayerMainBoard[Opponent].OwnedShips.Any(ship => !ship.IsDestroyed))
         {
+            _log?.LogInformation("Win condition not met.");
             return false;
         }
 
         Status = GameStatus.GameEnd;
+        _log?.LogInformation("Win condition met. {Opponent} ships are all has been destroyed. Game ended.",Opponent);
         return true;
     }
 
@@ -150,31 +159,44 @@ public class GameController
     /// <param name="mainBoard">The main board to set the ship on.</param>
     public void SetRandomShip(MainBoard mainBoard)
     {
-        Random random = new Random();
-
-        // create list of ships based on ShipType enum values
-        List<ShipType> shipTypes = Enum.GetValues(typeof(ShipType)).Cast<ShipType>().ToList();
-
-        foreach (ShipType shipType in shipTypes)
+        if (_log != null)
         {
-            // Generate random start position and orientation
-            int startX = random.Next(1, mainBoard.Rows + 1);
-            int startY = random.Next(1, mainBoard.Columns + 1);
-            ShipOrientation orientation = (ShipOrientation)random.Next(2); // 0 for Vertical, 1 for Horizontal
+            _log.LogInformation("Setting random ships on the main board...");
+            Random random = new Random();
 
-            // Create ship with the correct length
-            Ship ship = new Ship(new Position(startX, startY), shipType, orientation);
+            // create list of ships based on ShipType enum values
+            IEnumerable<ShipType> shipTypes = Enum.GetValues(typeof(ShipType)).Cast<ShipType>().ToList();
 
-            while (!TrySetShip(mainBoard, ship)) // Attempt to set the ship on the board, retry if it fails
+            foreach (ShipType shipType in shipTypes)
             {
-                startX = random.Next(1, mainBoard.Rows + 1);
-                startY = random.Next(1, mainBoard.Columns + 1);
-                orientation = (ShipOrientation)random.Next(2);
+                _log.LogInformation("Setting random ship of type {shipType}...", shipType);
 
-                ship = new Ship(new Position(startX, startY), shipType, orientation);
+                // Generate random start position and orientation
+                int startX = random.Next(1, mainBoard.Rows + 1);
+                int startY = random.Next(1, mainBoard.Columns + 1);
+                ShipOrientation orientation = (ShipOrientation)random.Next(2); // 0 for Vertical, 1 for Horizontal
+
+                // Create ship with the correct length
+                Ship ship = new Ship(new Position(startX, startY), shipType, orientation);
+
+                while (!TrySetShip(mainBoard, ship)) // Attempt to set the ship on the board, retry if it fails
+                {
+                    _log.LogWarning("Failed to set ship of type {shipType}. Retrying...", shipType);
+
+                    startX = random.Next(1, mainBoard.Rows + 1);
+                    startY = random.Next(1, mainBoard.Columns + 1);
+                    orientation = (ShipOrientation)random.Next(2);
+
+                    ship = new Ship(new Position(startX, startY), shipType, orientation);
+                }
+
+                _log.LogInformation("Successfully set ship of type {shipType}.", shipType);
             }
+
+            _log.LogInformation("Random ships set on the main board.");
         }
     }
+
 
     /// <summary>
     /// Attempts to set a ship on the main board.
@@ -235,7 +257,7 @@ public class GameController
 
             IPosition shipPosition = GetPositionInBoard(mainBoard, new Position(x, y));
             if (shipPosition == null || shipPosition.State != CellState.Empty) // return  false if the cell state is not empty
-            {   
+            {
                 return false;
             }
 

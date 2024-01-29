@@ -20,9 +20,9 @@ public class BattleBoard : IBoard
 
     public void InitializeBoard()
     {
-        for (int i = 1; i < Rows + 1; i++)
+        for (int i = Columns; i > 0; i--)
         {
-            for (int j = 1; j < Columns + 1; j++)
+            for (int j = 1; j < Rows + 1; j++)
             {
                 BoardPositions.Add(new Position(i, j));
             }

@@ -15,9 +15,10 @@ internal class Program {
                         b.AddNLog("nlog.config");
                     });
         ILogger<GameController> logger = loggerFactory.CreateLogger<GameController>();
+        ILogger<GameUI> logger2 = loggerFactory.CreateLogger<GameUI>();
 
         GameController game = new GameController(logger); 
-
+        GameUI gameUI = new GameUI(logger2);
         while (true)
         {
             if (game.Status == GameStatus.NotReady)

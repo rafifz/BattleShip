@@ -4,21 +4,20 @@ using BattleShip.UI;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 
-internal class Program {
-    private static void Main(string[] args) {
-
-        //manual creation w/o dependency injection
+internal class Program
+{
+    private static void Main(string[] args)
+    {
         var loggerFactory = LoggerFactory.Create(b =>
-                    {
-                        b.ClearProviders();
-                        b.SetMinimumLevel(LogLevel.Information);
-                        b.AddNLog("nlog.config");
-                    });
+        {
+            b.ClearProviders();
+            b.SetMinimumLevel(LogLevel.Information);
+            b.AddNLog("nlog.config");
+        });
         ILogger<GameController> logger = loggerFactory.CreateLogger<GameController>();
-        ILogger<GameUI> logger2 = loggerFactory.CreateLogger<GameUI>();
+        
 
-        GameController game = new GameController(logger); 
-        GameUI gameUI = new GameUI(logger2);
+        GameController game = new GameController(logger);
         while (true)
         {
             if (game.Status == GameStatus.NotReady)

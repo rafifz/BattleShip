@@ -12,37 +12,65 @@ public class GameController
     /// <summary>
     /// Gets or sets the current player.
     /// </summary>
-    public IPlayer? CurrentPlayer { get; private set; }
+    public IPlayer? CurrentPlayer
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// Gets the number of turns.
     /// </summary>
-    public int NumberOfTurn { get; private set; }
+    public int NumberOfTurn
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// Gets the list of players.
     /// </summary>
-    public List<IPlayer> Players { get; set; }
+    public List<IPlayer> Players
+    {
+        get;
+        set;
+    }
 
     /// <summary>
     /// Gets the main board for each player.
     /// </summary>
-    public Dictionary<IPlayer, MainBoard> PlayerMainBoard { get; private set; }
+    public Dictionary<IPlayer, MainBoard> PlayerMainBoard
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// Gets the battle board for each player.
     /// </summary>
-    public Dictionary<IPlayer, BattleBoard> PlayerBattleBoard { get; private set; }
+    public Dictionary<IPlayer, BattleBoard> PlayerBattleBoard
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// Gets the list of unmanaged ships for each player.
     /// </summary>
-    public Dictionary<IPlayer, List<ShipType>> PlayersUnmanagedShips { get; private set; }
+    public Dictionary<IPlayer, List<ShipType>> PlayersUnmanagedShips
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// Gets or sets the current game status.
     /// </summary>
-    public GameStatus Status { get; set; }
+    public GameStatus Status
+    {
+        get;
+        set;
+    }
 
     /// <summary>
     /// Gets the index of the next player.
@@ -69,6 +97,16 @@ public class GameController
         _log?.LogInformation("GameController initialized successfully.");
     }
 
+    /// <summary>
+    /// Add player to list of player
+    /// </summary>
+    /// <param name="player">The player to add.</param>
+    public bool AddPlayer(IPlayer player)
+    {
+        Players.Add(player);
+        _log?.LogInformation("Player {PlayerName} is successfully added to the game", player.Name);
+        return true;
+    }
     /// <summary>
     /// Sets the current player.
     /// </summary>
@@ -140,7 +178,7 @@ public class GameController
     /// <returns>True if all the opponent owned ships are destroyed, false otherwise.</returns>
     private bool CheckWinCondition()
     {
-        _log?.LogInformation("Checking win condition. is {Opponent} ships are all has been destroyed",Opponent);
+        _log?.LogInformation("Checking win condition. is {Opponent} ships are all has been destroyed", Opponent);
 
         if (PlayerMainBoard[Opponent].OwnedShips.Any(ship => !ship.IsDestroyed))
         {
@@ -149,7 +187,7 @@ public class GameController
         }
 
         Status = GameStatus.GameEnd;
-        _log?.LogInformation("Win condition met. {Opponent} ships are all has been destroyed. Game ended.",Opponent);
+        _log?.LogInformation("Win condition met. {Opponent} ships are all has been destroyed. Game ended.", Opponent);
         return true;
     }
 
@@ -193,7 +231,7 @@ public class GameController
                 _log.LogInformation("Successfully set ship of type {shipType}.", shipType);
             }
 
-            _log.LogInformation("Random ships set on the main board.");
+            _log.LogInformation($"{shipTypes.Count()} Random ships set on the player main board.");
         }
     }
 
@@ -275,21 +313,28 @@ public class GameController
     /// <returns>True if the attack was successful, false otherwise.</returns>
     public bool PerformAttack(IPosition position)
     {
+        _log?.LogInformation($"{CurrentPlayer?.Name} is performing attack at position: {position}");
+
         var ownPositionInBattleBoard = GetPositionInBoard(PlayerBattleBoard[CurrentPlayer!], position);
         var enemyPositionInMainBoard = GetPositionInBoard(PlayerMainBoard[Opponent!], position);
 
-        if (position != null && enemyPositionInMainBoard.State == CellState.Empty) //attack miss
+        if (enemyPositionInMainBoard.State == CellState.Empty) //attack miss
         {
             ownPositionInBattleBoard.State = CellState.Miss;
+
+            _log?.LogInformation($"Player {CurrentPlayer?.Name} missed an attack at position {position}");
         }
-        else if (position != null && enemyPositionInMainBoard.State == CellState.Ship) //attack success
+        else if (enemyPositionInMainBoard.State == CellState.Ship) //attack success
         {
             ownPositionInBattleBoard.State = CellState.Hit;
             enemyPositionInMainBoard.State = CellState.Sink;
             DecreaseShipsLife(PlayerMainBoard[Opponent].OwnedShips, position);
+
+            _log?.LogInformation($"Player {CurrentPlayer?.Name} hit an enemy ship at position {position}");
             return true;
         }
 
+        _log?.LogWarning($"Unexpected state {enemyPositionInMainBoard.State} for position {position}");
         return false;
     }
     private IPosition GetPositionInBoard(IBoard board, IPosition position)

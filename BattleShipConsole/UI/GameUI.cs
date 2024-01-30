@@ -65,28 +65,32 @@ public class GameUI
     {
         var playerOwnedShips = gameController.PlayerMainBoard[gameController.Opponent!].OwnedShips;
         Console.WriteLine($"\n---------- {gameController.Opponent.Name}'s ships : ----------");
+
         foreach (var ship in playerOwnedShips)
         {
             Console.WriteLine($"{ship.Type} {ship.LifePoint} IsDestroyed: {ship.IsDestroyed}");
         }
-        Console.WriteLine("----------------------------------");
+        
+        Console.WriteLine("-------------------------------------");
     }
     public static void PrintPlayerUnmanagedShips(GameController gameController, IPlayer player)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         int count = 1;
 
-        System.Console.WriteLine();
+        Console.WriteLine();
         foreach (var shipType in gameController.PlayersUnmanagedShips[player])
         {
-            int size = shipType switch
+            int size = shipType
+            switch
             {
                 ShipType.AircraftCarrier => 5,
                 ShipType.Battleship => 4,
                 ShipType.Cruiser => 3,
                 ShipType.Submarine => 3,
                 ShipType.Destroyer => 2,
-                _ => throw new ArgumentException($"Unknown ship type: {shipType}"),
+                _ =>
+                throw new ArgumentException($"Unknown ship type: {shipType}"),
             };
 
             string shipShape = new string('☒', size);
@@ -105,7 +109,10 @@ public class GameUI
             string playerName = Console.ReadLine()!;
 
             IPlayer player = new Player(gameController.Players.Count + 1, playerName);
-            AddPlayer(player, gameController);
+            gameController.AddPlayer(player);
+            gameController.PlayerMainBoard.Add(player, new MainBoard(6, 6));
+            gameController.PlayerBattleBoard.Add(player, new BattleBoard(6, 6));
+
             Console.WriteLine($"Player '{playerName}' added successfully!");
             Thread.Sleep(500);
             Console.Clear();
@@ -114,15 +121,6 @@ public class GameUI
         }
         gameController.SetCurrentPlayer(gameController.Players[new Random().Next(gameController.Players.Count)]);
         gameController.NextTurn();
-    }
-    public static bool AddPlayer(IPlayer player, GameController gameController)
-    {
-        gameController.Players.Add(player);
-        gameController.PlayerMainBoard.Add(player, new MainBoard(6, 6));
-        gameController.PlayerBattleBoard.Add(player, new BattleBoard(6, 6));
-        gameController.PlayersUnmanagedShips[player] = Enum.GetValues(typeof(ShipType)).Cast<ShipType>().ToList();
-        _log?.LogInformation("Player {PlayerName} is successfully added to the game",player.Name);
-        return true;
     }
     public static void ShipConfigurationInput(GameController gameController, IPlayer player)
     {
@@ -134,6 +132,8 @@ public class GameUI
         if (userInput == "1")
         {
             Console.Clear();
+            gameController.PlayersUnmanagedShips[player] = Enum.GetValues(typeof(ShipType)).Cast<ShipType>().ToList();
+
             PrintBoard(gameController.PlayerMainBoard[player]);
             PrintPlayerUnmanagedShips(gameController, player);
             while (gameController.PlayersUnmanagedShips[player].Count > 0)
